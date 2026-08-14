@@ -8,6 +8,8 @@ import {
   type WeatherData,
 } from "./services/weather-service";
 import { WeatherDataComponent } from "./components/weather-data-component";
+import type { NewPersonDTO, Person } from "./persons/persons.model";
+import { createPerson } from "./persons/persons.service";
 
 function App() {
   const [counter, setCounter] = useState(0);
@@ -42,6 +44,20 @@ function App() {
         }}
       >
         Get Weather Data
+      </button>
+
+      <button
+        onClick={async () => {
+          console.log("Creating Person!");
+          const person: NewPersonDTO = {
+            name: "Alice",
+            email: "alice@test.com",
+            elo: 1200,
+          };
+          const createdPerson: Person = await createPerson(person);
+        }}
+      >
+        CREATE PERSON!
       </button>
     </>
   );
