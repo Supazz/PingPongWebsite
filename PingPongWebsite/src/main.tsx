@@ -6,6 +6,7 @@ import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import ReactDOM from "react-dom/client";
 import { Rankings } from "./Rankings.tsx";
+import { Admin } from "./Admin.tsx";
 
 const router = createBrowserRouter([
   {
