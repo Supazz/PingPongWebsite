@@ -15,6 +15,7 @@ import type { Person } from "./persons/persons.model";
 export function Rankings() {
   const [people, setPeople] = useState<Person[]>([]);
 
+  // Get all people after component is rendered
   useEffect(() => {
     getPeople().then(setPeople);
   }, []);

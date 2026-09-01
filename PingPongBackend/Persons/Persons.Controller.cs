@@ -40,4 +40,17 @@ public class PersonsController : ControllerBase
         await _db.SaveChangesAsync();
         return Ok(NewPerson);
     }
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<Person>> DeletePerson(Guid id)
+    {
+        var person = await _db.Persons.FindAsync(id);
+        if (person is null)
+        {
+            return NotFound();
+        }
+        _db.Persons.Remove(person);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
 }
