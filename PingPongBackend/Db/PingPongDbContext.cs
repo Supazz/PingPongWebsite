@@ -7,9 +7,10 @@ using System.Collections.Generic;
 
 public class PingPongDbContext : DbContext
 {
-    public DbSet<Person> Persons {get; set;}
-    
-    public string DbPath{get;}
+    public DbSet<Person> Persons { get; set; }
+    public DbSet<Match> Matches { get; set; }
+
+    public string DbPath { get; }
 
     public PingPongDbContext()
     {
