@@ -12,10 +12,12 @@ import {
 import type { Person } from "./persons/persons.model";
 import { deletePerson, getPeople } from "./persons/persons.service";
 import { CreatePlayer } from "./CreatePlayer";
+import { useNavigate } from "react-router";
 
 export function ManagePlayers() {
   const [people, setPeople] = useState<Person[]>([]);
   const [isCreatePlayerOpen, setIsCreatePlayerOpen] = useState(false);
+  const navigate = useNavigate();
 
   const loadPeople = async () => {
     const peopleFromApi = await getPeople();
@@ -38,6 +40,10 @@ export function ManagePlayers() {
             Add players or remove players from the club.
           </p>
         </div>
+
+        <Button type="button" onClick={() => navigate("/Admin")}>
+          Admin
+        </Button>
 
         <Button
           type="button"
