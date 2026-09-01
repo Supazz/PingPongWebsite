@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import ReactDOM from "react-dom/client";
@@ -14,11 +13,7 @@ import { ScheduleMatch } from "./ScheduleMatch.tsx";
 import { RefMatch } from "./RefMatch.tsx";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
-  { path: "/rankings", element: <Rankings /> },
+  { path: "/", element: <Rankings /> },
   { path: "/manage-players", element: <ManagePlayers /> },
   { path: "admin", element: <Admin /> },
   { path: "/manage-matches", element: <ManageMatches /> },
