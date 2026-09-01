@@ -8,6 +8,7 @@ import ReactDOM from "react-dom/client";
 import { Rankings } from "./Rankings.tsx";
 import { CreatePlayer } from "./CreatePlayer.tsx";
 import { ManagePlayers } from "./ManagePlayers.tsx";
+import { Admin } from "./admin.tsx";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ const router = createBrowserRouter([
   },
   { path: "/rankings", element: <Rankings /> },
   { path: "/manage-players", element: <ManagePlayers /> },
+  {path:"admin", element: <Admin/>}
 ]);
 
 const root = document.getElementById("root");
