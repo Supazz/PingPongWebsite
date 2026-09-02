@@ -25,8 +25,4 @@ export const deletePerson = async (id: string) => {
   const response = await fetch(url, {
     method: "DELETE",
   });
-
-  if (!response.ok) {
-    throw new Error("Unable to delete player");
-  }
 };

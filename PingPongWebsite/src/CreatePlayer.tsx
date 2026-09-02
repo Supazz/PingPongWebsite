@@ -6,7 +6,7 @@ import type { NewPersonDTO } from "./persons/persons.model";
 import { createPerson } from "./persons/persons.service";
 
 interface CreatePlayerProps {
-  onSuccess?: () => void;
+  onSuccess: () => void;
 }
 export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
   return (
