@@ -30,6 +30,9 @@ export function CreateMatch() {
   const [player2, setPlayer2] = useState("");
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
+  const [matchTime, setMatchTime] = useState("");
+
+  const isFormComplete = Boolean(player1 && player2 && date && matchTime);
 
   const loadPeople = async () => {
     const peopleFromApi = await getPeople();
@@ -58,12 +61,9 @@ export function CreateMatch() {
       {/* Form Card */}
       <div className="rounded-xl border bg-card p-6 shadow-sm">
         <form
-          onSubmit={async(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
 
-            const formData = new FormData(event.currentTarget);
-            const matchTime = String(formData.get("matchTime"));
-            //All fields must be filled out before trying to subimt
             if (!player1 || !player2 || !date || !matchTime) {
               return;
             }
@@ -78,6 +78,7 @@ export function CreateMatch() {
             };
             await createMatch(match);
           }}
+          noValidate
           className="space-y-6"
         >
           {/* Players */}
@@ -180,9 +181,17 @@ export function CreateMatch() {
                 type="time"
                 id="time-picker"
                 step="1"
+                value={matchTime}
+                onChange={(event) => setMatchTime(event.target.value)}
               />
             </Field>
           </FieldGroup>
+
+          {!isFormComplete && (
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              Complete all required fields to create a match.
+            </p>
+          )}
 
           {/* Actions */}
           <div className="flex justify-end gap-3 border-t pt-6">
@@ -196,7 +205,7 @@ export function CreateMatch() {
               Cancel
             </Button>
 
-            <Button type="submit">
+            <Button type="submit" disabled={!isFormComplete}>
               <Swords />
               Create match
             </Button>

@@ -9,6 +9,15 @@ interface CreatePlayerProps {
   onSuccess: () => void;
 }
 export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [elo, setElo] = useState("");
+
+  const isFormComplete = Boolean(
+    firstName.trim() && lastName.trim() && email.trim() && elo,
+  );
+
   return (
     // <main className="flex min-h-svh flex-col items-center px-4 py-12">
     <>
@@ -19,23 +28,21 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
         onSubmit={async (event) => {
           event.preventDefault();
 
-          const formData = new FormData(event.currentTarget);
-
-          const firstName = String(formData.get("firstName"));
-          const lastName = String(formData.get("lastName"));
-          const email = String(formData.get("email"));
-          const elo = Number(formData.get("elo"));
+          if (!isFormComplete) {
+            return;
+          }
 
           const person: NewPersonDTO = {
-            name: `${firstName} ${lastName}`,
-            email: email,
-            elo: elo,
+            name: `${firstName.trim()} ${lastName.trim()}`,
+            email: email.trim(),
+            elo: Number(elo),
           };
 
           //API call
           await createPerson(person);
           onSuccess?.();
         }}
+        noValidate
         className="w-full max-w-md space-y-5 rounded-xl border bg-card p-6 text-left shadow-sm"
       >
         <div className="space-y-2">
@@ -45,6 +52,8 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
             id="first-name"
             name="firstName"
             placeholder="Enter first name"
+            value={firstName}
+            onChange={(event) => setFirstName(event.target.value)}
           />
         </div>
 
@@ -55,6 +64,8 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
             id="last-name"
             name="lastName"
             placeholder="Enter last name"
+            value={lastName}
+            onChange={(event) => setLastName(event.target.value)}
           />
         </div>
 
@@ -64,8 +75,10 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
             required
             id="email"
             name="email"
-            min="0"
+            type="email"
             placeholder="Enter email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
           />
         </div>
 
@@ -78,10 +91,18 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
             type="number"
             min="0"
             placeholder="100"
+            value={elo}
+            onChange={(event) => setElo(event.target.value)}
           />
         </div>
 
-        <Button className="w-full" type="submit">
+        {!isFormComplete && (
+          <p className="text-sm text-muted-foreground" aria-live="polite">
+            Complete all required fields to create a player.
+          </p>
+        )}
+
+        <Button className="w-full" type="submit" disabled={!isFormComplete}>
           Create player
         </Button>
       </form>
