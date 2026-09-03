@@ -24,7 +24,11 @@ import type { Person } from "./persons/persons.model";
 import type { NewMatchDTO } from "./Matches/matches.model";
 import { createMatch } from "./Matches/matches.service";
 
-export function CreateMatch() {
+interface CreateMatchProps {
+  onSuccess?: () => void;
+}
+
+export function CreateMatch({ onSuccess }: CreateMatchProps) {
   const [people, setPeople] = useState<Person[]>([]);
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
@@ -33,6 +37,8 @@ export function CreateMatch() {
   const [matchTime, setMatchTime] = useState("");
 
   const isFormComplete = Boolean(player1 && player2 && date && matchTime);
+  const isDuplicatePlayers = Boolean(player1 && player2 && player1 === player2);
+  const canSubmit = isFormComplete && isDuplicatePlayers;
 
   const loadPeople = async () => {
     const peopleFromApi = await getPeople();
@@ -64,7 +70,7 @@ export function CreateMatch() {
           onSubmit={async (event) => {
             event.preventDefault();
 
-            if (!player1 || !player2 || !date || !matchTime) {
+            if (!player1 || !player2 || !date || !matchTime || isDuplicatePlayers) {
               return;
             }
             const selectedPlayer1 = player1;
@@ -77,6 +83,7 @@ export function CreateMatch() {
               date: matchDateTime,
             };
             await createMatch(match);
+            await onSuccess?.();
           }}
           noValidate
           className="space-y-6"
@@ -187,7 +194,7 @@ export function CreateMatch() {
             </Field>
           </FieldGroup>
 
-          {!isFormComplete && (
+          {(!isFormComplete && !isDuplicatePlayers) && (
             <p className="text-sm text-muted-foreground" aria-live="polite">
               Complete all required fields to create a match.
             </p>
@@ -195,17 +202,7 @@ export function CreateMatch() {
 
           {/* Actions */}
           <div className="flex justify-end gap-3 border-t pt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                // Add your cancel/navigation behavior here.
-              }}
-            >
-              Cancel
-            </Button>
-
-            <Button type="submit" disabled={!isFormComplete}>
+            <Button type="submit" disabled={!canSubmit}>
               <Swords />
               Create match
             </Button>

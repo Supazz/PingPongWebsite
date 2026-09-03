@@ -15,7 +15,6 @@ const router = createBrowserRouter([
   { path: "/manage-players", element: <ManagePlayers /> },
   { path: "admin", element: <Admin /> },
   { path: "/manage-matches", element: <ManageMatches /> },
-  { path: "create-match", element: <CreateMatch /> },
   { path: "ref-match", element: <RefMatch /> },
 ]);
 

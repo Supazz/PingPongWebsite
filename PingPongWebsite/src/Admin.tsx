@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
-import { Users, Swords } from "lucide-react";
+import { Trophy, Users, Swords } from "lucide-react";
 
 export function Admin() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export function Admin() {
         Manage players and matches for the club.
       </p>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2">
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Button
           variant="outline"
           onClick={() => navigate("/manage-players")}
@@ -38,6 +38,20 @@ export function Admin() {
           <span className="font-semibold">Manage Matches</span>
           <span className="text-sm font-normal text-muted-foreground">
             Record results and review match history.
+          </span>
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={() => navigate("/")}
+          className="h-auto flex-col items-center gap-3 whitespace-normal rounded-xl p-8 text-center"
+        >
+          <span className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Trophy className="size-5" />
+          </span>
+          <span className="font-semibold">View Rankings</span>
+          <span className="text-sm font-normal text-muted-foreground">
+            See the current player rankings.
           </span>
         </Button>
       </div>

@@ -30,8 +30,12 @@ export const getMatches = async () => {
 };
 
 export const deleteMatch = async (id: string) => {
-  const url = "http://localhost:5167/api/Matches";
+  const url = `http://localhost:5167/api/Matches/${id}`;
   const response = await fetch(url, {
-    method: "Delete",
+    method: "DELETE",
   });
+
+  if (!response.ok) {
+    throw new Error("Unable to delete the match. Please try again.");
+  }
 };

@@ -7,5 +7,5 @@ export type Match = {
   id: string;
   p1: string;
   p2: string;
-  date: string;
+  matchTime: string;
 };
