@@ -34,7 +34,8 @@ export function ManageMatches() {
 
   const loadMatches = async () => {
     const matchesFromApi = await getMatches();
-    const matchesByTime = [...matchesFromApi].sort(
+    //Only Display Mathches that don't have a winner (haven't been reffed)
+    const matchesByTime = matchesFromApi.filter((match) => match.winner === 0).sort(
       (a, b) =>
         new Date(a.matchTime).getTime() - new Date(b.matchTime).getTime(),
     );
@@ -131,7 +132,7 @@ export function ManageMatches() {
                   colSpan={4}
                   className="py-10 text-center text-muted-foreground"
                 >
-                  No matches have been scheduled yet.
+                  No matches are awaiting results.
                 </TableCell>
               </TableRow>
             )}
@@ -168,9 +169,14 @@ export function ManageMatches() {
             aria-labelledby="ref-match-title"
             className="relative max-h-[90dvh] w-full max-w-2xl overflow-y-auto rounded-xl border bg-card text-card-foreground shadow-lg">
           <RefMatch key={selectedMatch.id}
+          matchId={selectedMatch.id}
             player1Name={people.find((person) => person.id === selectedMatch.p1)?.name ?? "Player 1"}
             player2Name={people.find((person) => person.id === selectedMatch.p2)?.name ?? "Player 2"}
             scheduledTime={displayMatchTime(selectedMatch.matchTime)}
+            onSuccess={async () => {
+              await loadMatches();
+              setSelectedMatch(null);
+            }}
             onClose={() => setSelectedMatch(null)}
           />
           </div>

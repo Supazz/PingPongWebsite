@@ -1,4 +1,4 @@
-import type { Match, NewMatchDTO } from "./matches.model";
+import type { Match, NewMatchDTO, NewMatchGameDTO, ScoreMatchDTO } from "./matches.model";
 
 export const createMatch = async (newMatch: NewMatchDTO) => {
   const url = "http://localhost:5167/api/Matches";
@@ -37,5 +37,22 @@ export const deleteMatch = async (id: string) => {
 
   if (!response.ok) {
     throw new Error("Unable to delete the match. Please try again.");
+  }
+};
+
+export const scoreMatch = async (
+  matchId: string,
+  result: ScoreMatchDTO,
+
+) => {
+  const url = `http://localhost:5167/api/Matches/${matchId}/result`;
+  const response = await fetch(url, {
+    method: "Patch",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(result),
+  });
+  if(!response.ok){
+    const message = await response.text();
+    throw new Error(message || "Unable to save match scores");
   }
 };

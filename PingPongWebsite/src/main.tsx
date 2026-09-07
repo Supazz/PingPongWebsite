@@ -12,7 +12,6 @@ const router = createBrowserRouter([
   { path: "/manage-players", element: <ManagePlayers /> },
   { path: "admin", element: <Admin /> },
   { path: "/manage-matches", element: <ManageMatches /> },
-  { path: "ref-match", element: <RefMatch /> },
 ]);
 
 const root = document.getElementById("root");

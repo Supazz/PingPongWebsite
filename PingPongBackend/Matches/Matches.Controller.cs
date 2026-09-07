@@ -59,7 +59,7 @@ public class MatchesController : ControllerBase
     [HttpPatch("{matchId:guid}/result")]
     public async Task<IActionResult> ScoreMatch(
         [FromRoute] Guid matchId,
-        [FromBody] List<MatchGameDTO> matchGameDTOs)
+        [FromBody] ScoreMatchDTO scoreMatchDTO)
     {
         var match = await _db.Matches
             .Include(m => m.Games)
@@ -68,20 +68,24 @@ public class MatchesController : ControllerBase
         if (match is null)
             return NotFound("Match not found.");
 
-        if (match.MatchType != MatchType.ThreeGames &&
-            match.MatchType != MatchType.FiveGames)
-            return BadRequest("The match must be configured as best of 3 or best of 5.");
+        if (scoreMatchDTO is null)
+            return BadRequest("A match format and game scores are required.");
 
-        int maximumGames = (int)match.MatchType;
+        if (scoreMatchDTO.MatchType != MatchType.ThreeGames &&
+            scoreMatchDTO.MatchType != MatchType.FiveGames)
+            return BadRequest("Match type must be 3 or 5.");
+
+        int maximumGames = (int)scoreMatchDTO.MatchType;
         int winsNeeded = maximumGames / 2 + 1;
 
-        if (matchGameDTOs is null || matchGameDTOs.Count < winsNeeded || matchGameDTOs.Count > maximumGames)
+        var games = scoreMatchDTO.Games;
+        if (games is null || games.Count < winsNeeded || games.Count > maximumGames)
             return BadRequest($"Submit between {winsNeeded} and {maximumGames} games for a completed match.");
 
-        if (matchGameDTOs.Any(game => game is null))
+        if (games.Any(game => game is null))
             return BadRequest("Game entries cannot be null.");
 
-        var submittedGames = matchGameDTOs.OrderBy(game => game.GameNumber).ToList();
+        var submittedGames = games.OrderBy(game => game.GameNumber).ToList();
         int player1Wins = 0;
         int player2Wins = 0;
 
@@ -100,6 +104,9 @@ public class MatchesController : ControllerBase
 
             if (game.P1Score == game.P2Score)
                 return BadRequest($"Game {game.GameNumber}: a completed game cannot end in a tie.");
+
+            if (Math.Max(game.P1Score, game.P2Score) < 11)
+                return BadRequest($"Game {game.GameNumber}: the winning score must be at least 11.");
 
             if (game.P1Score > game.P2Score)
                 player1Wins++;
@@ -127,7 +134,8 @@ public class MatchesController : ControllerBase
                     P1Score = submitted.P1Score,
                     P2Score = submitted.P2Score
                 };
-                match.Games.Add(game);
+                // This is a new row even though its GUID is already assigned.
+                _db.MatchGames.Add(game);
             }
             else
             {
@@ -138,6 +146,7 @@ public class MatchesController : ControllerBase
         }
 
         _db.MatchGames.RemoveRange(previousGames);
+        match.MatchType = scoreMatchDTO.MatchType;
         match.Winner = player1Wins == winsNeeded ? Winner.P1 : Winner.P2;
         await _db.SaveChangesAsync();
 
