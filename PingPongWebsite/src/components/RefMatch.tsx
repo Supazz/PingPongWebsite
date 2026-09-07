@@ -206,6 +206,7 @@ export function RefMatch({
             setIsSaving(true);
             try {
               await scoreMatch(matchId, { games, matchType: gameCount });
+              
               if (onSuccess) await onSuccess();
               else onClose();
             } catch (error) {

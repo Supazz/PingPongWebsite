@@ -6,12 +6,13 @@ import { Rankings } from "./components/Rankings.tsx";
 import { ManagePlayers } from "./components/ManagePlayers.tsx";
 import { Admin } from "./components/Admin.tsx";
 import { ManageMatches } from "./components/ManageMatches.tsx";
-import { RefMatch } from "./components/RefMatch.tsx";
+import { PastMatches } from "./components/PastMatches.tsx";
 const router = createBrowserRouter([
   { path: "/", element: <Rankings /> },
   { path: "/manage-players", element: <ManagePlayers /> },
   { path: "admin", element: <Admin /> },
-  { path: "/manage-matches", element: <ManageMatches /> },
+  { path: "/manage-matches", element: <ManageMatches />},
+  {path: "/past-matches", element: <PastMatches/>}
 ]);
 
 const root = document.getElementById("root");
