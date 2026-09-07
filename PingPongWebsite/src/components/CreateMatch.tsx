@@ -19,10 +19,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { getPeople } from "./persons/persons.service";
-import type { Person } from "./persons/persons.model";
-import type { NewMatchDTO } from "./Matches/matches.model";
-import { createMatch } from "./Matches/matches.service";
+import { getPeople } from "@/src/persons/persons.service";
+import type { Person } from "@/src/persons/persons.model";
+import type { NewMatchDTO } from "@/src/Matches/matches.model";
+import { createMatch } from "@/src/Matches/matches.service";
 
 interface CreateMatchProps {
   onSuccess?: () => void;
@@ -38,7 +38,7 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
 
   const isFormComplete = Boolean(player1 && player2 && date && matchTime);
   const isDuplicatePlayers = Boolean(player1 && player2 && player1 === player2);
-  const canSubmit = isFormComplete && isDuplicatePlayers;
+  const canSubmit = isFormComplete && !isDuplicatePlayers;
 
   const loadPeople = async () => {
     const peopleFromApi = await getPeople();
@@ -70,7 +70,13 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
           onSubmit={async (event) => {
             event.preventDefault();
 
-            if (!player1 || !player2 || !date || !matchTime || isDuplicatePlayers) {
+            if (
+              !player1 ||
+              !player2 ||
+              !date ||
+              !matchTime ||
+              isDuplicatePlayers
+            ) {
               return;
             }
             const selectedPlayer1 = player1;
@@ -194,9 +200,15 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
             </Field>
           </FieldGroup>
 
-          {(!isFormComplete && !isDuplicatePlayers) && (
+          {!isFormComplete && (
             <p className="text-sm text-muted-foreground" aria-live="polite">
               Complete all required fields to create a match.
+            </p>
+          )}
+
+          {isDuplicatePlayers && (
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              You can't choose duplicate players!
             </p>
           )}
 

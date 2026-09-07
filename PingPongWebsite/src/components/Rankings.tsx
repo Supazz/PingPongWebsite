@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { getPeople } from "./persons/persons.service";
+import { getPeople } from "../persons/persons.service";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState, useEffect } from "react";
-import type { Person } from "./persons/persons.model";
+import type { Person } from "../persons/persons.model";
 export function Rankings() {
   const [people, setPeople] = useState<Person[]>([]);
 

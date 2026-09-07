@@ -9,8 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Person } from "./persons/persons.model";
-import { deletePerson, getPeople } from "./persons/persons.service";
+import type { Person } from "../persons/persons.model";
+import { deletePerson, getPeople } from "../persons/persons.service";
 import { CreatePlayer } from "./CreatePlayer";
 import { useNavigate } from "react-router";
 

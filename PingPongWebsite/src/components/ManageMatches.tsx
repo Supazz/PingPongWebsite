@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Trash2, Swords } from "lucide-react";
+import { Trash2, Swords, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,17 @@ import {
 } from "@/components/ui/table";
 
 import { CreateMatch } from "./CreateMatch";
-import type { Match } from "./Matches/matches.model";
-import { deleteMatch, getMatches } from "./Matches/matches.service";
-import type { Person } from "./persons/persons.model";
-import { getPeople } from "./persons/persons.service";
+import type { Match } from "../Matches/matches.model";
+import { deleteMatch, getMatches } from "../Matches/matches.service";
+import type { Person } from "../persons/persons.model";
+import { getPeople } from "../persons/persons.service";
+import { RefMatch } from "./RefMatch";
 
 export function ManageMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [isCreateMatchOpen, setIsCreateMatchOpen] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const navigate = useNavigate();
 
   const loadPeople = async () => {
@@ -53,11 +55,11 @@ export function ManageMatches() {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Manage Matches</h1>
           <p className="mt-1 text-muted-foreground">
-            Schedule matches or remove them from the calendar.
+            Schedule matches, enter scores, or manage the calendar.
           </p>
         </div>
 
@@ -78,7 +80,7 @@ export function ManageMatches() {
               <TableHead>Player 1</TableHead>
               <TableHead>Player 2</TableHead>
               <TableHead>Scheduled time</TableHead>
-              <TableHead className="w-20 text-center">Actions</TableHead>
+              <TableHead className="w-44 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -97,6 +99,14 @@ export function ManageMatches() {
                     {displayMatchTime(match.matchTime)}
                   </TableCell>
                   <TableCell className="text-center">
+                    <div className="flex items-center justify-end gap-2">
+                    <Button type="button" variant="outline" size="sm"
+                      className="gap-2 bg-card text-primary"
+                      aria-label={`Ref match between ${player1?.name ?? "unknown player"} and ${player2?.name ?? "unknown player"}`}
+                      onClick={() => setSelectedMatch(match)}>
+                      <ClipboardList />
+                      Ref match
+                    </Button>
                     <Button
                       type="button"
                       variant="ghost"
@@ -109,6 +119,7 @@ export function ManageMatches() {
                     >
                       <Trash2 className="text-destructive" />
                     </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );
@@ -145,6 +156,23 @@ export function ManageMatches() {
                 setIsCreateMatchOpen(false);
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {selectedMatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="ref-match-title"
+            className="relative max-h-[90dvh] w-full max-w-2xl overflow-y-auto rounded-xl border bg-card text-card-foreground shadow-lg">
+          <RefMatch key={selectedMatch.id}
+            player1Name={people.find((person) => person.id === selectedMatch.p1)?.name ?? "Player 1"}
+            player2Name={people.find((person) => person.id === selectedMatch.p2)?.name ?? "Player 2"}
+            scheduledTime={displayMatchTime(selectedMatch.matchTime)}
+            onClose={() => setSelectedMatch(null)}
+          />
           </div>
         </div>
       )}

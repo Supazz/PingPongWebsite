@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import type { NewPersonDTO } from "./persons/persons.model";
-import { createPerson } from "./persons/persons.service";
+import type { NewPersonDTO } from "@/src/persons/persons.model";
+import { createPerson } from "@/src/persons/persons.service";
 
 interface CreatePlayerProps {
   onSuccess: () => void;
