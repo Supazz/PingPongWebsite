@@ -147,7 +147,20 @@ public class MatchesController : ControllerBase
 
         _db.MatchGames.RemoveRange(previousGames);
         match.MatchType = scoreMatchDTO.MatchType;
+        var player1 = await _db.Persons.FindAsync(match.P1);
+        var player2 = await _db.Persons.FindAsync(match.P2);
+
+
+        if (player1 is null || player2 is null)
+        {
+            return NotFound("One or both players were not found");
+        }
+
+
         match.Winner = player1Wins == winsNeeded ? Winner.P1 : Winner.P2;
+        (int player1Elo, int player2Elo) = EloCalculator.Calculate(match.Winner, player1.Elo, player2.Elo);
+        player1.Elo = player1Elo;
+        player2.Elo = player2Elo;
         await _db.SaveChangesAsync();
 
         return NoContent();
