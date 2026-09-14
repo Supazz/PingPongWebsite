@@ -1,11 +1,13 @@
 namespace PingPongBackend.Db;
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PingPongBackend.Persons;
 using System;
 using System.Collections.Generic;
 
-public class PingPongDbContext : DbContext
+public class PingPongDbContext : IdentityDbContext<IdentityUser>
 {
     public DbSet<Person> Persons { get; set; }
     public DbSet<Match> Matches { get; set; }
@@ -35,6 +37,5 @@ public class PingPongDbContext : DbContext
             .HasIndex(game => new { game.MatchId, game.GameNumber })
             .IsUnique();
     }
-
 }
 
