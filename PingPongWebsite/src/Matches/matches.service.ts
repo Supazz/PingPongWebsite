@@ -1,7 +1,8 @@
+import { API_BASE_URL } from "../api";
 import type { Match, NewMatchDTO, NewMatchGameDTO, ScoreMatchDTO } from "./matches.model";
 
 export const createMatch = async (newMatch: NewMatchDTO) => {
-  const url = "http://localhost:5167/api/Matches";
+  const url = `${API_BASE_URL}/api/Matches`;
   const requestBody = {
     p1: newMatch.p1,
     p2: newMatch.p2,
@@ -23,14 +24,14 @@ export const createMatch = async (newMatch: NewMatchDTO) => {
 };
 
 export const getMatches = async () => {
-  const url = "http://localhost:5167/api/Matches";
+  const url = `${API_BASE_URL}/api/Matches`;
   const response = await fetch(url);
   const responseData: Match[] = await response.json();
   return responseData;
 };
 
 export const deleteMatch = async (id: string) => {
-  const url = `http://localhost:5167/api/Matches/${id}`;
+  const url = `${API_BASE_URL}/api/Matches/${id}`;
   const response = await fetch(url, {
     method: "DELETE",
   });
@@ -45,7 +46,7 @@ export const scoreMatch = async (
   result: ScoreMatchDTO,
 
 ) => {
-  const url = `http://localhost:5167/api/Matches/${matchId}/result`;
+  const url = `${API_BASE_URL}/api/Matches/${matchId}/result`;
   const response = await fetch(url, {
     method: "Patch",
     headers: { "Content-Type": "application/json" },

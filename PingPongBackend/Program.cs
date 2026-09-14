@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using PingPongBackend.Db;
 using Scalar.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins(
+                "http://localhost:5173",
+                "https://pingpong.zacharypursell.us")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -30,6 +33,14 @@ builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider
+        .GetRequiredService<PingPongDbContext>();
+
+    db.Database.Migrate();
+}
 if (app.Environment.IsDevelopment() &&
     app.Configuration.GetValue<bool>("BootstrapAdmin:Enabled"))
 {
@@ -98,7 +109,10 @@ if (app.Environment.IsDevelopment())
 
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();

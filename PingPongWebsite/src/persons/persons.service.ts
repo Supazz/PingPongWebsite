@@ -1,7 +1,8 @@
+import { API_BASE_URL } from "../api";
 import type { NewPersonDTO, Person } from "./persons.model";
 
 export const createPerson = async (newPerson: NewPersonDTO) => {
-  const url = "http://localhost:5167/api/persons";
+  const url = `${API_BASE_URL}/api/persons`;
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -14,14 +15,14 @@ export const createPerson = async (newPerson: NewPersonDTO) => {
 };
 
 export const getPeople = async () => {
-  const url = "http://localhost:5167/api/persons";
+  const url = `${API_BASE_URL}/api/persons`;
   const response = await fetch(url);
   const responseData: Person[] = await response.json();
   return responseData;
 };
 
 export const deletePerson = async (id: string) => {
-  const url = `http://localhost:5167/api/persons/${id}`;
+  const url = `${API_BASE_URL}/api/persons/${id}`;
   const response = await fetch(url, {
     method: "DELETE",
   });

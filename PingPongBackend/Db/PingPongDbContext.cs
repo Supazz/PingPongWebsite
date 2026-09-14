@@ -19,7 +19,8 @@ public class PingPongDbContext : IdentityDbContext<IdentityUser>
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         var path = Environment.GetFolderPath(folder);
-        DbPath = Path.Join(path, "ping_pong.db");
+        DbPath = Environment.GetEnvironmentVariable("DATABASE_PATH")
+    ?? Path.Join(path, "ping_pong.db");
 
     }
 

@@ -1,0 +1,30 @@
+services:
+  frontend:
+    build: ./PingPongWebsite
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL-http://localhost:5167}
+    ports:
+      - "127.0.0.1:5173:5173"
+
+  backend:
+    build: ./PingPongBackend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5167:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      DATABASE_PATH: /data/ping_pong.db
+    volumes:
+      - backend-data:/data
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in the root .env file}
+
+volumes:
+  backend-data:
