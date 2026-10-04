@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Trash2, Swords, ClipboardList } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +29,6 @@ export function ManageMatches() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const loadPeople = async () => {
     const peopleFromApi = await getPeople();
@@ -69,7 +68,7 @@ export function ManageMatches() {
           </p>
         </div>
 
-        <Button type="button" onClick={() => navigate("/Admin")}>
+        <Button render={<Link to="/admin" />} nativeButton={false}>
           Admin
         </Button>
 

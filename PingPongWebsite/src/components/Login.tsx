@@ -3,8 +3,9 @@ import type { LoginRequest } from "../auth/login.model";
 import { login } from "../auth/login.service";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router";
-import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { useAuth } from "../auth/useAuth";
 export function Login() {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -12,6 +13,7 @@ export function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isFormComplete = Boolean(username.trim() && password.length > 0);
   const navigate = useNavigate();
+  const {refreshUser} = useAuth();
 
   return (
     <main className="flex min-h-svh flex-col items-center justify-center px-4 py-12">
@@ -34,6 +36,7 @@ export function Login() {
 
           try {
             await login(request);
+            await refreshUser();
             navigate("/admin");
           } catch (error) {
             setErrorMessage(
@@ -86,6 +89,9 @@ export function Login() {
           {isSubmitting ? "Signing in…" : "Login"}
         </Button>
       </form>
+      <Link to="/" className={buttonVariants({ variant: "outline", className: "mt-6" })}>
+        Back to rankings
+      </Link>
     </main>
   );
 }

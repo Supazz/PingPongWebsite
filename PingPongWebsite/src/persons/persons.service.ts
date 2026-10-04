@@ -1,5 +1,5 @@
 import { API_BASE_URL, checkResponse } from "../api";
-import type { NewPersonDTO, Person } from "./persons.model";
+import type { AdminPerson, NewPersonDTO, Person } from "./persons.model";
 
 export const createPerson = async (newPerson: NewPersonDTO) => {
   const url = `${API_BASE_URL}/api/persons`;
@@ -12,7 +12,7 @@ export const createPerson = async (newPerson: NewPersonDTO) => {
     body: JSON.stringify(newPerson),
   });
   checkResponse(response, "Unable to create player. Please try again.");
-  const responseData: Person = await response.json();
+  const responseData: AdminPerson = await response.json();
   return responseData;
 };
 
@@ -32,4 +32,12 @@ export const deletePerson = async (id: string) => {
   });
 
   checkResponse(response, "Unable to delete player. Please try again.");
+};
+
+export const getAdminPeople = async (): Promise<AdminPerson[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/persons/admin`, {
+    credentials: "include",
+  });
+  checkResponse(response, "Unable to load player details. Please try again.");
+  return await response.json();
 };

@@ -7,6 +7,9 @@ export type NewPersonDTO = {
 export type Person = {
   id: string;
   name: string;
-  email: string;
   elo: number;
+};
+
+export type AdminPerson = Person & {
+  email: string;
 };

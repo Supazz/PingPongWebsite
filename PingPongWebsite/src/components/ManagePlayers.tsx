@@ -10,21 +10,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Person } from "../persons/persons.model";
-import { deletePerson, getPeople } from "../persons/persons.service";
+import type { AdminPerson } from "../persons/persons.model";
+import { deletePerson, getAdminPeople } from "../persons/persons.service";
 import { CreatePlayer } from "./CreatePlayer";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 export function ManagePlayers() {
-  const [people, setPeople] = useState<Person[]>([]);
+  const [people, setPeople] = useState<AdminPerson[]>([]);
   const [isCreatePlayerOpen, setIsCreatePlayerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const loadPeople = async () => {
-    const peopleFromApi = await getPeople();
+    const peopleFromApi = await getAdminPeople();
     const alphabetizedPeople = [...peopleFromApi].sort((a, b) =>
       a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
     );
@@ -47,7 +46,7 @@ export function ManagePlayers() {
           </p>
         </div>
 
-        <Button type="button" onClick={() => navigate("/Admin")}>
+        <Button render={<Link to="/admin" />} nativeButton={false}>
           Admin
         </Button>
 

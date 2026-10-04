@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Trash2, Trophy } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Match } from "../Matches/matches.model";
@@ -22,7 +22,6 @@ export function PastMatches() {
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
@@ -71,7 +70,7 @@ export function PastMatches() {
           <h1 className="text-3xl font-bold tracking-tight">Past Matches</h1>
           <p className="mt-1 text-muted-foreground">Review completed matches and their winners.</p>
         </div>
-        <Button type="button" onClick={() => navigate("/admin")}>Admin</Button>
+        <Button render={<Link to="/admin" />} nativeButton={false}>Admin</Button>
       </div>
 
       {error && <p role="alert" className="mb-4 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}

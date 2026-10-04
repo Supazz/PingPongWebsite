@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router";
+import { buttonVariants } from "@/components/ui/button";
+import { Link } from "react-router";
+import { useAuth } from "../auth/useAuth";
 import { getPeople } from "../persons/persons.service";
 import { getErrorMessage } from "../api";
 import {
@@ -14,7 +15,7 @@ import {
 import { useState, useEffect } from "react";
 import type { Person } from "../persons/persons.model";
 export function Rankings() {
-  const navigate = useNavigate();
+  const { user, loading: authLoading, error: authError } = useAuth();
   const [people, setPeople] = useState<Person[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,9 +42,16 @@ export function Rankings() {
           Current club rankings based on Elo rating
         </p>
         </div>
-        <Button type="button" onClick={() => navigate("/login")}>
-          Log in
-        </Button>
+        {!authLoading && !authError && !user && (
+          <Link to="/login" className={buttonVariants()}>
+            Log in
+          </Link>
+        )}
+        {!authLoading && !authError && user?.roles.includes("Admin") && (
+          <Link to="/admin" className={buttonVariants()}>
+            Admin
+          </Link>
+        )}
       </div>
 
       {error && <p role="alert" className="mb-4 text-sm text-destructive">{error}</p>}

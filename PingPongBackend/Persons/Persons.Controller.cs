@@ -21,9 +21,31 @@ public class PersonsController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
 
-    public async Task<ActionResult<List<Person>>> GetPersons()
+    public async Task<ActionResult<List<PublicPersonDTO>>> GetPersons()
     {
-        return await _db.Persons.ToListAsync();
+        return await _db.Persons.AsNoTracking()
+            .Select(person => new PublicPersonDTO
+            {
+                Id = person.Id,
+                Name = person.Name,
+                Elo = person.Elo
+            })
+            .ToListAsync();
+    }
+
+    [HttpGet("admin")]
+    public async Task<ActionResult<List<AdminPersonDTO>>> GetAdminPersons()
+    {
+        // Inherits the controller's Admin authorization requirement.
+        return await _db.Persons.AsNoTracking()
+            .Select(person => new AdminPersonDTO
+            {
+                Id = person.Id,
+                Name = person.Name,
+                Email = person.Email,
+                Elo = person.Elo
+            })
+            .ToListAsync();
     }
 
     [HttpPost]

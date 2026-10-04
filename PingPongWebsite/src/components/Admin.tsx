@@ -1,14 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Trophy, Users, Swords, History } from "lucide-react";
 import { useState } from "react";
 import { logout } from "../auth/login.service";
 import { getErrorMessage } from "../api";
+import { useAuth } from "../auth/useAuth";
 
 export function Admin() {
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const {clearUser} = useAuth();
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-16 text-center">
@@ -28,6 +30,7 @@ export function Admin() {
           setIsLoggingOut(true);
           try {
             await logout();
+            clearUser();
             navigate("/", { replace: true });
           } catch (error) {
             setError(getErrorMessage(error));
@@ -43,7 +46,8 @@ export function Admin() {
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         <Button
           variant="outline"
-          onClick={() => navigate("/manage-players")}
+          render={<Link to="/manage-players" />}
+          nativeButton={false}
           className="h-auto flex-col items-center gap-3 whitespace-normal rounded-xl p-8 text-center"
         >
           <span className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -57,7 +61,8 @@ export function Admin() {
 
         <Button
           variant="outline"
-          onClick={() => navigate("/manage-matches")}
+          render={<Link to="/manage-matches" />}
+          nativeButton={false}
           className="h-auto flex-col items-center gap-3 whitespace-normal rounded-xl p-8 text-center"
         >
           <span className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -71,7 +76,8 @@ export function Admin() {
 
         <Button
           variant="outline"
-          onClick={() => navigate("/past-matches")}
+          render={<Link to="/past-matches" />}
+          nativeButton={false}
           className="h-auto flex-col items-center gap-3 whitespace-normal rounded-xl p-8 text-center"
         >
           <span className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -85,7 +91,8 @@ export function Admin() {
 
         <Button
           variant="outline"
-          onClick={() => navigate("/")}
+          render={<Link to="/" />}
+          nativeButton={false}
           className="h-auto flex-col items-center gap-3 whitespace-normal rounded-xl p-8 text-center"
         >
           <span className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
