@@ -8,6 +8,7 @@ import type { Match } from "../Matches/matches.model";
 import { deleteMatch, getMatches } from "../Matches/matches.service";
 import type { Person } from "../persons/persons.model";
 import { getPeople } from "../persons/persons.service";
+import { getErrorMessage } from "../api";
 
 function completedMatches(matches: Match[]) {
   return matches
@@ -32,8 +33,8 @@ export function PastMatches() {
           setMatches(completedMatches(matchesFromApi));
           setPeople(peopleFromApi);
         }
-      } catch {
-        if (!cancelled) setError("Unable to load past matches. Please reload the page to try again.");
+      } catch (error) {
+        if (!cancelled) setError(getErrorMessage(error));
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -43,15 +44,17 @@ export function PastMatches() {
   }, []);
 
   async function handleDelete(id: string) {
+    if (deletingId !== null) return;
     setDeletingId(id);
     setError(null);
     try {
       await deleteMatch(id);
-    } catch {
-      setError("Unable to delete the match. Please try again.");
+    } catch (error) {
+      setError(getErrorMessage(error));
       setDeletingId(null);
       return;
     }
+    setMatches((current) => current.filter((match) => match.id !== id));
     try {
       setMatches(completedMatches(await getMatches()));
     } catch {
@@ -121,4 +124,3 @@ export function PastMatches() {
     </div>
   );
 }
-

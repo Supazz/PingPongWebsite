@@ -23,9 +23,10 @@ import { getPeople } from "@/src/persons/persons.service";
 import type { Person } from "@/src/persons/persons.model";
 import type { NewMatchDTO } from "@/src/Matches/matches.model";
 import { createMatch } from "@/src/Matches/matches.service";
+import { getErrorMessage } from "../api";
 
 interface CreateMatchProps {
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<void>;
 }
 
 export function CreateMatch({ onSuccess }: CreateMatchProps) {
@@ -35,6 +36,8 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
   const [dateOpen, setDateOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [matchTime, setMatchTime] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const isFormComplete = Boolean(player1 && player2 && date && matchTime);
   const isDuplicatePlayers = Boolean(player1 && player2 && player1 === player2);
@@ -51,7 +54,7 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
   };
 
   useEffect(() => {
-    void loadPeople();
+    void loadPeople().catch((error) => setError(getErrorMessage(error)));
   }, []);
 
   return (
@@ -71,6 +74,7 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
             event.preventDefault();
 
             if (
+              isSaving ||
               !player1 ||
               !player2 ||
               !date ||
@@ -88,8 +92,16 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
               p2: selectedPlayer2,
               date: matchDateTime,
             };
-            await createMatch(match);
-            await onSuccess?.();
+            setError(null);
+            setIsSaving(true);
+            try {
+              await createMatch(match);
+              await onSuccess?.();
+            } catch (error) {
+              setError(getErrorMessage(error));
+            } finally {
+              setIsSaving(false);
+            }
           }}
           noValidate
           className="space-y-6"
@@ -212,11 +224,12 @@ export function CreateMatch({ onSuccess }: CreateMatchProps) {
             </p>
           )}
 
+          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
           {/* Actions */}
           <div className="flex justify-end gap-3 border-t pt-6">
-            <Button type="submit" disabled={!canSubmit}>
+            <Button type="submit" disabled={!canSubmit || isSaving}>
               <Swords />
-              Create match
+              {isSaving ? "Creating…" : "Create match"}
             </Button>
           </div>
         </form>

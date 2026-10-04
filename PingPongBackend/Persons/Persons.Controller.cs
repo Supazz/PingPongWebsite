@@ -1,4 +1,5 @@
 using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ namespace PingPongBackend.Persons;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class PersonsController : ControllerBase
 {
     private readonly PingPongDbContext _db;
@@ -17,6 +19,7 @@ public class PersonsController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
 
     public async Task<ActionResult<List<Person>>> GetPersons()
     {

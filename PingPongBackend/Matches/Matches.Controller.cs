@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PingPongBackend.Db;
@@ -8,6 +9,7 @@ namespace PingPongBackend.Matches;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 
 
 public class MatchesController : ControllerBase
@@ -19,7 +21,7 @@ public class MatchesController : ControllerBase
     }
 
     [HttpGet]
-
+    [AllowAnonymous]
     public async Task<ActionResult<List<Match>>> GetMatches()
     {
         return await _db.Matches.ToListAsync();

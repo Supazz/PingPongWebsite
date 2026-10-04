@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Delete, Trash2, UserPlus } from "lucide-react";
+import { Trash2, UserPlus } from "lucide-react";
+import { getErrorMessage } from "../api";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -17,6 +18,9 @@ import { useNavigate } from "react-router";
 export function ManagePlayers() {
   const [people, setPeople] = useState<Person[]>([]);
   const [isCreatePlayerOpen, setIsCreatePlayerOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const loadPeople = async () => {
@@ -28,7 +32,9 @@ export function ManagePlayers() {
     setPeople(alphabetizedPeople);
   };
   useEffect(() => {
-    void loadPeople();
+    void loadPeople()
+      .catch((error) => setError(getErrorMessage(error)))
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -56,7 +62,8 @@ export function ManagePlayers() {
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+      {error && <p role="alert" className="mb-4 text-sm text-destructive">{error}</p>}
+      <div className="overflow-hidden rounded-xl border bg-card shadow-sm" aria-busy={isLoading}>
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
@@ -83,9 +90,26 @@ export function ManagePlayers() {
                     variant="ghost"
                     size="icon"
                     aria-label={`Delete ${person.name}`}
+                    disabled={deletingId !== null}
                     onClick={async () => {
-                      await deletePerson(person.id);
-                      await loadPeople();
+                      if (deletingId !== null) return;
+                      setError(null);
+                      setDeletingId(person.id);
+                      try {
+                        await deletePerson(person.id);
+                      } catch (error) {
+                        setError(getErrorMessage(error));
+                        setDeletingId(null);
+                        return;
+                      }
+                      setPeople((current) => current.filter((player) => player.id !== person.id));
+                      try {
+                        await loadPeople();
+                      } catch {
+                        setError("The player was deleted, but the list could not refresh. Please reload the page.");
+                      } finally {
+                        setDeletingId(null);
+                      }
                     }}
                   >
                     <Trash2 className="text-destructive" />
@@ -100,7 +124,7 @@ export function ManagePlayers() {
                   colSpan={4}
                   className="py-10 text-center text-muted-foreground"
                 >
-                  No players have been added yet.
+                  {isLoading ? "Loading players…" : error ? "Unable to display players." : "No players have been added yet."}
                 </TableCell>
               </TableRow>
             )}
@@ -117,8 +141,13 @@ export function ManagePlayers() {
                   </button>
                   <CreatePlayer
                     onSuccess={async () => {
-                      await loadPeople();
                       setIsCreatePlayerOpen(false);
+                      try {
+                        await loadPeople();
+                        setError(null);
+                      } catch {
+                        setError("The player was created, but the list could not refresh. Please reload the page.");
+                      }
                     }}
                   ></CreatePlayer>
                 </div>

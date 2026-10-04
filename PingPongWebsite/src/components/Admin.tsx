@@ -1,9 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import { Trophy, Users, Swords, History } from "lucide-react";
+import { useState } from "react";
+import { logout } from "../auth/login.service";
+import { getErrorMessage } from "../api";
 
 export function Admin() {
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-16 text-center">
@@ -11,6 +16,29 @@ export function Admin() {
       <p className="mt-3 text-muted-foreground">
         Manage players and matches for the club.
       </p>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="mt-6"
+        disabled={isLoggingOut}
+        onClick={async () => {
+          if (isLoggingOut) return;
+          setError(null);
+          setIsLoggingOut(true);
+          try {
+            await logout();
+            navigate("/", { replace: true });
+          } catch (error) {
+            setError(getErrorMessage(error));
+          } finally {
+            setIsLoggingOut(false);
+          }
+        }}
+      >
+        {isLoggingOut ? "Logging out…" : "Log out"}
+      </Button>
+      {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         <Button

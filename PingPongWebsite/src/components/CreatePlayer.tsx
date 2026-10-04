@@ -4,15 +4,18 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import type { NewPersonDTO } from "@/src/persons/persons.model";
 import { createPerson } from "@/src/persons/persons.service";
+import { getErrorMessage } from "../api";
 
 interface CreatePlayerProps {
-  onSuccess: () => void;
+  onSuccess: () => void | Promise<void>;
 }
 export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [elo, setElo] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const isFormComplete = Boolean(
     firstName.trim() && lastName.trim() && email.trim() && elo,
@@ -28,7 +31,7 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
         onSubmit={async (event) => {
           event.preventDefault();
 
-          if (!isFormComplete) {
+          if (!isFormComplete || isSaving) {
             return;
           }
 
@@ -38,9 +41,16 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
             elo: Number(elo),
           };
 
-          //API call
-          await createPerson(person);
-          onSuccess?.();
+          setError(null);
+          setIsSaving(true);
+          try {
+            await createPerson(person);
+            await onSuccess();
+          } catch (error) {
+            setError(getErrorMessage(error));
+          } finally {
+            setIsSaving(false);
+          }
         }}
         noValidate
         className="w-full max-w-md space-y-5 rounded-xl border bg-card p-6 text-left shadow-sm"
@@ -102,8 +112,9 @@ export function CreatePlayer({ onSuccess }: CreatePlayerProps) {
           </p>
         )}
 
-        <Button className="w-full" type="submit" disabled={!isFormComplete}>
-          Create player
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        <Button className="w-full" type="submit" disabled={!isFormComplete || isSaving}>
+          {isSaving ? "Creating…" : "Create player"}
         </Button>
       </form>
     </>

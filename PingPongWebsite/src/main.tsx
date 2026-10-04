@@ -7,12 +7,14 @@ import { ManagePlayers } from "./components/ManagePlayers.tsx";
 import { Admin } from "./components/Admin.tsx";
 import { ManageMatches } from "./components/ManageMatches.tsx";
 import { PastMatches } from "./components/PastMatches.tsx";
+import { Login } from "./components/Login.tsx";
 const router = createBrowserRouter([
   { path: "/", element: <Rankings /> },
   { path: "/manage-players", element: <ManagePlayers /> },
   { path: "admin", element: <Admin /> },
   { path: "/manage-matches", element: <ManageMatches />},
-  {path: "/past-matches", element: <PastMatches/>}
+  {path: "/past-matches", element: <PastMatches/>},
+  {path: "/login", element: <Login/>},
 ]);
 
 const root = document.getElementById("root");

@@ -1,11 +1,12 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router";
 import { getPeople } from "../persons/persons.service";
+import { getErrorMessage } from "../api";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -13,11 +14,16 @@ import {
 import { useState, useEffect } from "react";
 import type { Person } from "../persons/persons.model";
 export function Rankings() {
+  const navigate = useNavigate();
   const [people, setPeople] = useState<Person[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Get all people after component is rendered
   useEffect(() => {
-    getPeople().then(setPeople);
+    void getPeople().then(setPeople)
+      .catch((error) => setError(getErrorMessage(error)))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const sortedPeople = [...people].sort((a, b) => {
@@ -26,16 +32,22 @@ export function Rankings() {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
         <h1 className="text-3xl font-bold tracking-tight">
           Ping Pong Rankings
         </h1>
         <p className="text-muted-foreground mt-1">
           Current club rankings based on Elo rating
         </p>
+        </div>
+        <Button type="button" onClick={() => navigate("/login")}>
+          Log in
+        </Button>
       </div>
 
-      <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
+      {error && <p role="alert" className="mb-4 text-sm text-destructive">{error}</p>}
+      <div className="rounded-xl border bg-card shadow-sm overflow-hidden" aria-busy={isLoading}>
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
@@ -46,6 +58,11 @@ export function Rankings() {
           </TableHeader>
 
           <TableBody>
+            {people.length === 0 && (
+              <TableRow><TableCell colSpan={3} className="py-10 text-center text-muted-foreground">
+                {isLoading ? "Loading rankings…" : error ? "Rankings could not be loaded." : "No players have been added yet."}
+              </TableCell></TableRow>
+            )}
             {sortedPeople.map((person: Person, index: number) => {
               return (
                 <TableRow

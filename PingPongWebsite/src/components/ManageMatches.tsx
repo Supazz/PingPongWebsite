@@ -19,12 +19,16 @@ import { deleteMatch, getMatches } from "../Matches/matches.service";
 import type { Person } from "../persons/persons.model";
 import { getPeople } from "../persons/persons.service";
 import { RefMatch } from "./RefMatch";
+import { getErrorMessage } from "../api";
 
 export function ManageMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [isCreateMatchOpen, setIsCreateMatchOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const loadPeople = async () => {
@@ -43,8 +47,9 @@ export function ManageMatches() {
   };
 
   useEffect(() => {
-    void loadPeople();
-    void loadMatches();
+    void Promise.all([loadPeople(), loadMatches()])
+      .catch((error) => setError(getErrorMessage(error)))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const displayMatchTime = (matchTime: string) => {
@@ -74,7 +79,8 @@ export function ManageMatches() {
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+      {error && <p role="alert" className="mb-4 text-sm text-destructive">{error}</p>}
+      <div className="overflow-hidden rounded-xl border bg-card shadow-sm" aria-busy={isLoading}>
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
@@ -113,9 +119,26 @@ export function ManageMatches() {
                       variant="ghost"
                       size="icon"
                       aria-label={`Delete match between ${player1?.name ?? "unknown player"} and ${player2?.name ?? "unknown player"}`}
+                      disabled={deletingId !== null}
                       onClick={async () => {
-                        await deleteMatch(match.id);
-                        await loadMatches();
+                        if (deletingId !== null) return;
+                        setError(null);
+                        setDeletingId(match.id);
+                        try {
+                          await deleteMatch(match.id);
+                        } catch (error) {
+                          setError(getErrorMessage(error));
+                          setDeletingId(null);
+                          return;
+                        }
+                        setMatches((current) => current.filter((item) => item.id !== match.id));
+                        try {
+                          await loadMatches();
+                        } catch {
+                          setError("The match was deleted, but the list could not refresh. Please reload the page.");
+                        } finally {
+                          setDeletingId(null);
+                        }
                       }}
                     >
                       <Trash2 className="text-destructive" />
@@ -132,7 +155,7 @@ export function ManageMatches() {
                   colSpan={4}
                   className="py-10 text-center text-muted-foreground"
                 >
-                  No matches are awaiting results.
+                  {isLoading ? "Loading matches…" : error ? "Unable to display matches." : "No matches are awaiting results."}
                 </TableCell>
               </TableRow>
             )}
@@ -153,8 +176,13 @@ export function ManageMatches() {
             </button>
             <CreateMatch
               onSuccess={async () => {
-                await loadMatches();
                 setIsCreateMatchOpen(false);
+                try {
+                  await loadMatches();
+                  setError(null);
+                } catch {
+                  setError("The match was created, but the list could not refresh. Please reload the page.");
+                }
               }}
             />
           </div>
@@ -174,8 +202,13 @@ export function ManageMatches() {
             player2Name={people.find((person) => person.id === selectedMatch.p2)?.name ?? "Player 2"}
             scheduledTime={displayMatchTime(selectedMatch.matchTime)}
             onSuccess={async () => {
-              await loadMatches();
               setSelectedMatch(null);
+              try {
+                await Promise.all([loadMatches(), loadPeople()]);
+                setError(null);
+              } catch {
+                setError("The result was saved, but the lists could not refresh. Please reload the page.");
+              }
             }}
             onClose={() => setSelectedMatch(null)}
           />

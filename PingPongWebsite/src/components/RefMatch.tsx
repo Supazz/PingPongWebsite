@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { scoreMatch } from "../Matches/matches.service";
+import { getErrorMessage } from "../api";
 
 interface RefMatchProps {
   matchId: string;
@@ -210,7 +211,7 @@ export function RefMatch({
               if (onSuccess) await onSuccess();
               else onClose();
             } catch (error) {
-              setError(error instanceof Error ? error.message : "Unable to save scores.");
+              setError(getErrorMessage(error));
             } finally {
               setIsSaving(false);
             }
