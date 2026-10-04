@@ -20,8 +20,11 @@ import type { Person } from "../persons/persons.model";
 import { getPeople } from "../persons/persons.service";
 import { RefMatch } from "./RefMatch";
 import { getErrorMessage } from "../api";
+import { useAuth } from "../auth/useAuth";
 
 export function ManageMatches() {
+  const { user, loading: authLoading, error: authError } = useAuth();
+  const isAdmin = !authLoading && !authError && user?.roles.includes("Admin") === true;
   const [matches, setMatches] = useState<Match[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [isCreateMatchOpen, setIsCreateMatchOpen] = useState(false);
@@ -106,13 +109,13 @@ export function ManageMatches() {
                   </TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-end gap-2">
-                    <Button type="button" variant="outline" size="sm"
+                    {isAdmin && <Button type="button" variant="outline" size="sm"
                       className="gap-2 bg-card text-primary"
                       aria-label={`Ref match between ${player1?.name ?? "unknown player"} and ${player2?.name ?? "unknown player"}`}
                       onClick={() => setSelectedMatch(match)}>
                       <ClipboardList />
                       Ref match
-                    </Button>
+                    </Button>}
                     <Button
                       type="button"
                       variant="ghost"
@@ -188,7 +191,7 @@ export function ManageMatches() {
         </div>
       )}
 
-      {selectedMatch && (
+      {isAdmin && selectedMatch && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <div
             role="dialog"
