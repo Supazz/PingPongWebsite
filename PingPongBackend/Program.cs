@@ -17,7 +17,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
                 "http://localhost:5173",
-                "https://pingpong.zacharypursell.us")
+                "https://pingpong.zacharypursell.us",
+                "https://outabletennis.org")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

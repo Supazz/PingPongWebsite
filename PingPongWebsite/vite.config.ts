@@ -13,6 +13,6 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ["pingpong.zacharypursell.us"]
+    allowedHosts: ["pingpong.zacharypursell.us", "outabletennis.org"]
   }
 });
